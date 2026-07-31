@@ -1,0 +1,127 @@
+name: Rust Release
+
+# Reusable workflow: build + test a Rust project across a dynamic
+# platform/architecture matrix, then package each target as a zip containing the
+# release binary and the release notes.
+on:
+  workflow_call:
+    inputs:
+      rust-version:
+        description: "Rust toolchain (default: stable = latest stable)."
+        type: string
+        required: false
+        default: "stable"
+      architectures:
+        description: 'Space/comma list, e.g. "x86_64 aarch64".'
+        type: string
+        required: false
+        default: "x86_64"
+      platforms:
+        description: 'Space/comma list, e.g. "linux macos windows".'
+        type: string
+        required: false
+        default: "linux"
+      bin-name:
+        description: "Binary name (default: the [package] name in Cargo.toml)."
+        type: string
+        required: false
+        default: ""
+      release-notes:
+        description: "Path to the release notes file to include in each zip."
+        type: string
+        required: false
+        default: "RELEASE_NOTES.md"
+      upload-to-release:
+        description: "Attach the zips to the GitHub Release when run for a tag."
+        type: boolean
+        required: false
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.gen.outputs.matrix }}
+    steps:
+      - name: Generate build matrix
+        id: gen
+        uses: mrdoodles/rust-release@v1
+        with:
+          rust-version: ${{ inputs.rust-version }}
+          architectures: ${{ inputs.architectures }}
+          platforms: ${{ inputs.platforms }}
+
+  build:
+    needs: matrix
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.matrix.outputs.matrix) }}
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust ${{ matrix.rust-version }} (${{ matrix.target }})
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ matrix.rust-version }}
+          targets: ${{ matrix.target }}
+
+      - name: Build
+        run: cargo build --release --target ${{ matrix.target }}
+
+      - name: Test
+        run: cargo test --release --target ${{ matrix.target }}
+
+      - name: Package
+        id: package
+        shell: bash
+        env:
+          TARGET: ${{ matrix.target }}
+          BIN_NAME: ${{ inputs.bin-name }}
+          NOTES: ${{ inputs.release-notes }}
+        run: |
+          set -euo pipefail
+          bin="${BIN_NAME}"
+          if [ -z "${bin}" ]; then
+            # Derive from the [package] name in Cargo.toml.
+            bin="$(grep -m1 -E '^\s*name\s*=' Cargo.toml | sed -E 's/.*"([^"]+)".*/\1/')"
+          fi
+          ext=""
+          [ "${RUNNER_OS}" = "Windows" ] && ext=".exe"
+          binpath="target/${TARGET}/release/${bin}${ext}"
+          if [ ! -f "${binpath}" ]; then
+            echo "::error::Binary not found at ${binpath}"; exit 1
+          fi
+
+          stage="dist"
+          rm -rf "${stage}" && mkdir -p "${stage}"
+          cp "${binpath}" "${stage}/"
+          if [ -f "${NOTES}" ]; then cp "${NOTES}" "${stage}/"; else
+            echo "::warning::Release notes '${NOTES}' not found; packaging without them."
+          fi
+
+          zipname="${bin}-${TARGET}.zip"
+          if [ "${RUNNER_OS}" = "Windows" ]; then
+            7z a "${zipname}" "./${stage}/*" >/dev/null
+          else
+            (cd "${stage}" && zip -r "../${zipname}" . >/dev/null)
+          fi
+          echo "zip=${zipname}" >> "${GITHUB_OUTPUT}"
+          echo "name=${bin}-${TARGET}" >> "${GITHUB_OUTPUT}"
+          echo "Packaged ${zipname}"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.package.outputs.name }}
+          path: ${{ steps.package.outputs.zip }}
+
+      - name: Attach to release
+        if: inputs.upload-to-release && github.ref_type == 'tag'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "${{ github.ref_name }}" "${{ steps.package.outputs.zip }}" --clobber

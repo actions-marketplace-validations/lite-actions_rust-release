@@ -1,0 +1,39 @@
+name: Rust Release Matrix
+description: >-
+  Emit a dynamic build matrix (runner + Rust target triple per platform/arch)
+  for a Rust release, in pure shell.
+author: mrdoodles
+
+branding:
+  icon: grid
+  color: orange
+
+inputs:
+  rust-version:
+    description: "Rust toolchain to build with (default: stable = latest stable)."
+    required: false
+    default: "stable"
+  architectures:
+    description: 'Space/comma separated architectures, e.g. "x86_64 aarch64".'
+    required: false
+    default: "x86_64"
+  platforms:
+    description: 'Space/comma separated platforms, e.g. "linux macos windows".'
+    required: false
+    default: "linux"
+
+outputs:
+  matrix:
+    description: 'JSON build matrix: {"include":[{platform,arch,runner,target,rust-version}, ...]}.'
+    value: ${{ steps.gen.outputs.matrix }}
+
+runs:
+  using: composite
+  steps:
+    - id: gen
+      shell: bash
+      env:
+        INPUT_RUST_VERSION: ${{ inputs.rust-version }}
+        INPUT_ARCHITECTURES: ${{ inputs.architectures }}
+        INPUT_PLATFORMS: ${{ inputs.platforms }}
+      run: bash "${GITHUB_ACTION_PATH}/scripts/matrix.sh"
