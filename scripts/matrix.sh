@@ -28,7 +28,7 @@ map_target() {
   case "$1:$2" in
     linux:x86_64)    echo "ubuntu-latest|x86_64-unknown-linux-gnu" ;;
     linux:aarch64)   echo "ubuntu-24.04-arm|aarch64-unknown-linux-gnu" ;;
-    macos:x86_64)    echo "macos-13|x86_64-apple-darwin" ;;
+    macos:x86_64)    echo "macos-15-intel|x86_64-apple-darwin" ;;
     macos:aarch64)   echo "macos-latest|aarch64-apple-darwin" ;;
     windows:x86_64)  echo "windows-latest|x86_64-pc-windows-msvc" ;;
     windows:aarch64) echo "windows-11-arm|aarch64-pc-windows-msvc" ;;

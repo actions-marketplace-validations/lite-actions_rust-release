@@ -76,7 +76,7 @@ cross-compilation):
 | --------------- | ----------------- | ---------------------------- |
 | linux x86_64    | `ubuntu-latest`   | `x86_64-unknown-linux-gnu`   |
 | linux aarch64   | `ubuntu-24.04-arm`| `aarch64-unknown-linux-gnu`  |
-| macos x86_64    | `macos-13`        | `x86_64-apple-darwin`        |
+| macos x86_64    | `macos-15-intel`  | `x86_64-apple-darwin`        |
 | macos aarch64   | `macos-latest`    | `aarch64-apple-darwin`       |
 | windows x86_64  | `windows-latest`  | `x86_64-pc-windows-msvc`     |
 | windows aarch64 | `windows-11-arm`  | `aarch64-pc-windows-msvc`    |
