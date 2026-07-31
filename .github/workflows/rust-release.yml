@@ -74,7 +74,17 @@ jobs:
         run: cargo build --release --target ${{ matrix.target }}
 
       - name: Test
-        run: cargo test --release --target ${{ matrix.target }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Run tests when the crate has any (unit tests via #[test] / #[cfg(test)]
+          # in src, or integration tests under tests/). Otherwise skip with a notice.
+          if grep -rqsE '#\[test\]|#\[cfg\(test\)\]' src 2>/dev/null \
+             || ls tests/*.rs >/dev/null 2>&1; then
+            cargo test --release --target ${{ matrix.target }}
+          else
+            echo "::notice title=Tests skipped::No tests were provided; the test step was skipped for ${{ matrix.target }}."
+          fi
 
       - name: Package
         id: package

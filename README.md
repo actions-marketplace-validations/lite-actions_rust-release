@@ -34,6 +34,10 @@ jobs:
 | `release-notes`     | `RELEASE_NOTES.md` | File included in each zip.                              |
 | `upload-to-release` | `false`            | Attach zips to the GitHub Release when run for a tag.  |
 
+Tests run automatically when the crate has any (`#[test]` / `#[cfg(test)]` in
+`src`, or integration tests under `tests/`). If none are found, the test step is
+skipped and a notice is emitted — the build still proceeds and packages.
+
 ## Matrix action only (dynamic matrix)
 
 Use just the matrix generator and drive your own build job:
