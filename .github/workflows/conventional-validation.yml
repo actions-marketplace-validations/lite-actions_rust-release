@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: lite-actions/git-checkout@v1
         with:
           fetch-depth: 0
 
@@ -30,7 +30,7 @@ jobs:
 
       - name: Validate conventional commits & branch
         if: github.actor != 'dependabot[bot]'
-        uses: mrdoodles/conventional-validator@v1
+        uses: lite-actions/conventional-validator@v1
         with:
           validate-commits: "true"
           validate-branch: "true"
