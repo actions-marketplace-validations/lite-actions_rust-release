@@ -97,7 +97,7 @@ Cut releases by hand: `git tag -a vX.Y.Z`, force-move the major tag
 (initial) → **v1.0.1** (`macos-15-intel`) → **v1.1.0** (test auto-skip). `@v1` is
 the moving major tag.
 
-**The reusable workflow references the action as `mrdoodles/rust-release@v1`** —
+**The reusable workflow references the action as `lite-actions/rust-release@v1`** —
 keep the action tag and the workflow tag on the same `v1`, and after a breaking
 change cut the release so the workflow's `@v1` resolves to the matched code.
 
