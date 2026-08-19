@@ -2,7 +2,7 @@ name: Rust Release Matrix
 description: >-
   Emit a dynamic build matrix (runner + Rust target triple per platform/arch)
   for a Rust release, in pure shell.
-author: mrdoodles
+author: lite-actions
 
 branding:
   icon: grid
