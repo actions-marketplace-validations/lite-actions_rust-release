@@ -14,7 +14,7 @@ matrix. Two pieces, in pure shell:
 ```yaml
 jobs:
   release:
-    uses: mrdoodles/rust-release/.github/workflows/rust-release.yml@v1
+    uses: lite-actions/rust-release/.github/workflows/rust-release.yml@v1
     with:
       rust-version: stable            # optional; default: latest stable
       platforms: "linux macos windows"
@@ -50,7 +50,7 @@ jobs:
       matrix: ${{ steps.gen.outputs.matrix }}
     steps:
       - id: gen
-        uses: mrdoodles/rust-release@v1
+        uses: lite-actions/rust-release@v1
         with:
           platforms: "linux macos"
           architectures: "x86_64 aarch64"

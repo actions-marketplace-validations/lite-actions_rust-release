@@ -48,7 +48,7 @@ jobs:
     steps:
       - name: Generate build matrix
         id: gen
-        uses: mrdoodles/rust-release@v1
+        uses: lite-actions/rust-release@v1
         with:
           rust-version: ${{ inputs.rust-version }}
           architectures: ${{ inputs.architectures }}
