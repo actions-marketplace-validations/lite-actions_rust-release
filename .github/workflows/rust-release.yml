@@ -125,7 +125,7 @@ jobs:
           echo "Packaged ${zipname}"
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ steps.package.outputs.name }}
           path: ${{ steps.package.outputs.zip }}
