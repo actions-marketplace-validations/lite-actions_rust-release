@@ -40,7 +40,7 @@ jobs:
       # makes the commit through lite-actions/signed-commit because a runner
       # has no signing key and main requires signed commits.
       - name: Changelog and release notes
-        uses: lite-actions/common-workflows/changelog@v1
+        uses: lite-actions/actions-workflows/changelog@v1
         with:
           bot-token: ${{ secrets.CHANGELOG_BOT_TOKEN }}
           approve-token: ${{ secrets.CHANGELOG_APPROVE_TOKEN }}
